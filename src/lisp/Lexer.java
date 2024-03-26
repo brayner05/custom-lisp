@@ -1,6 +1,8 @@
 package lisp;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 
 public class Lexer {
@@ -9,6 +11,13 @@ public class Lexer {
     private int current = 0;
     private int start = 0;
     private int line = 0;
+    private static final Map<String, TokenType> keywords = new HashMap<>();
+
+    static {
+        keywords.put("or", TokenType.OR);
+        keywords.put("and", TokenType.AND);
+        keywords.put("print", TokenType.PRINT);
+    }
 
     public Lexer(String source) {
         this.source = source;
@@ -38,14 +47,37 @@ public class Lexer {
             case '=' -> addToken(TokenType.EQUAL);
             case '%' -> addToken(TokenType.MODULO);
             case '"' -> addStringToken();
+            case '~' -> addToken(TokenType.NOT);
             default -> {
                 if (Character.isDigit(ch)) {
                     addNumberToken();
                     break;
                 }
+
+                if (Character.isAlphabetic(ch)) {
+                    addIdentifierToken();
+                    break;
+                }
+
                 ErrorReporter.error(line, "Unexpected token: " + ch);
             }
         }
+    }
+
+    private void addIdentifierToken() {
+        while (!isAtEnd() && Character.isAlphabetic(peek())) {
+            consume();
+        }
+
+        // If the identifier is an existing reserved word, then add the respective token
+        String identifier = source.substring(start, current);
+        if (keywords.containsKey(identifier)) {
+            addToken(keywords.get(identifier));
+            return;
+        }
+
+        // Otherwise the identifier will be considered a variable/function name
+        addToken(TokenType.IDENTIFIER);
     }
 
     private void ignoreComment() {
@@ -98,11 +130,22 @@ public class Lexer {
         return source.charAt(current++);
     }
 
+    private boolean match(char ch) {
+        return peek() == ch;
+    }
+
     private char peek() {
         if (isAtEnd()) {
             return '\0';
         }
         return source.charAt(current);
+    }
+
+    private char peekNext() {
+        if (current + 1 >= source.length()) {
+            return '\0';
+        }
+        return source.charAt(current + 1);
     }
 
     private boolean isAtEnd() {
