@@ -28,6 +28,9 @@ public class Lexer {
         switch (ch) {
             case ' ', '\r', '\t' -> {}
             case '\n' -> line++;
+            case ';' -> ignoreComment();
+            case '(' -> addToken(TokenType.LPAREN);
+            case ')' -> addToken(TokenType.RPAREN);
             case '+' -> addToken(TokenType.PLUS);
             case '-' -> addToken(TokenType.MINUS);
             case '*' -> addToken(TokenType.STAR);
@@ -39,6 +42,12 @@ public class Lexer {
                 }
                 hadError = true;
             }
+        }
+    }
+
+    private void ignoreComment() {
+        while (!isAtEnd() && peek() != '\n') {
+            consume();
         }
     }
 
