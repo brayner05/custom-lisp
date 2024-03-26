@@ -59,7 +59,7 @@ public class Lexer {
                     break;
                 }
 
-                ErrorReporter.error(line, "Unexpected token: " + ch);
+                ErrorReporter.error(line, current, "Unexpected token: " + ch);
             }
         }
     }
@@ -91,8 +91,9 @@ public class Lexer {
             consume();
         }
 
+        // If the lexer reaches the end of the file and hasn't found the termination quote
         if (isAtEnd()) {
-            ErrorReporter.error(line, "Unterminated string");
+            ErrorReporter.error(line, current, "Unterminated string");
             return;
         }
 
@@ -106,6 +107,7 @@ public class Lexer {
             consume();
         }
 
+        // Allow for floating point
         if (peek() == '.') {
             consume();
             while (!isAtEnd() && Character.isDigit(peek())) {
@@ -123,7 +125,7 @@ public class Lexer {
 
     private void addToken(TokenType type, Object literal) {
         String lexeme = source.substring(start, current);
-        tokens.add(new Token(type, lexeme, literal));
+        tokens.add(new Token(line, current, type, lexeme, literal));
     }
 
     private char consume() {

@@ -6,6 +6,7 @@ import lisp.Lexer;
 
 public class Main {
     private static final String EXIT_KEYWORD = ".quit";
+    // TODO add support for pseudo-operations
 
     public static void main(String[] args) throws IOException {
         var input = new InputStreamReader(System.in);

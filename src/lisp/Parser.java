@@ -1,6 +1,7 @@
 package lisp;
 
 import java.util.List;
+import java.util.Stack;
 
 public class Parser {
     private final List<Token> tokens;
