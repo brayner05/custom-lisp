@@ -35,6 +35,7 @@ public class Lexer {
             case '-' -> addToken(TokenType.MINUS);
             case '*' -> addToken(TokenType.STAR);
             case '/' -> addToken(TokenType.SLASH);
+            case '"' -> addStringToken();
             default -> {
                 if (Character.isDigit(ch)) {
                     addNumberToken();
@@ -49,6 +50,21 @@ public class Lexer {
         while (!isAtEnd() && peek() != '\n') {
             consume();
         }
+    }
+
+    private void addStringToken() {
+        while (!isAtEnd() && peek() != '"') {
+            consume();
+        }
+
+        if (isAtEnd()) {
+            // error: unterminated string
+            return;
+        }
+
+        consume();
+        String literal = source.substring(start + 1, current - 1);
+        addToken(TokenType.STRING, literal);
     }
 
     private void addNumberToken() {
