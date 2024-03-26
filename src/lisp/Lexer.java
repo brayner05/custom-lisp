@@ -9,7 +9,6 @@ public class Lexer {
     private int current = 0;
     private int start = 0;
     private int line = 0;
-    private boolean hadError = false;
 
     public Lexer(String source) {
         this.source = source;
@@ -20,6 +19,7 @@ public class Lexer {
             scanToken();
             start = current;
         }
+        addToken(TokenType.EOF);
         return tokens;
     }
 
@@ -35,13 +35,15 @@ public class Lexer {
             case '-' -> addToken(TokenType.MINUS);
             case '*' -> addToken(TokenType.STAR);
             case '/' -> addToken(TokenType.SLASH);
+            case '=' -> addToken(TokenType.EQUAL);
+            case '%' -> addToken(TokenType.MODULO);
             case '"' -> addStringToken();
             default -> {
                 if (Character.isDigit(ch)) {
                     addNumberToken();
                     break;
                 }
-                hadError = true;
+                ErrorReporter.error(line, "Unexpected token: " + ch);
             }
         }
     }
@@ -58,7 +60,7 @@ public class Lexer {
         }
 
         if (isAtEnd()) {
-            // error: unterminated string
+            ErrorReporter.error(line, "Unterminated string");
             return;
         }
 

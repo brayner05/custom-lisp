@@ -8,5 +8,7 @@ public enum TokenType {
     LPAREN, RPAREN,
 
     // Literals
-    STRING, NUMBER, IDENTIFIER
+    STRING, NUMBER, IDENTIFIER,
+    
+    EOF
 }
